@@ -1,0 +1,6 @@
+[2025-12-23 02:11:25.219] [info] | | | | | | | | | |  Flexiv RDK v1.8  | | | | | | | | | |
+[2025-12-23 02:11:26.325] [info] [flexiv::rdk::Robot] Searching for [Rizon4-123456] ...
+[2025-12-23 02:11:28.327] [info] >>>>> Flexiv RDK exited <<<<<
+[2025-12-23 02:11:28.328] [error] [flexiv::rdk::Robot] Failed to connect to [Rizon4-123456]. Please check that: a) Remote mode (Ethernet) is enabled on the target robot; b) Ethernet connection with the target robot is established; c) The specified serial number of the target robot is correct; d) No firewall is active or this RDK program is whitelisted; e) RDK version is compatible with the target robot's software version
+[2025-12-23 02:11:28.328] [warning] This message should also appear in the log file
+[2025-12-23 02:11:28.328] [info] Program finished

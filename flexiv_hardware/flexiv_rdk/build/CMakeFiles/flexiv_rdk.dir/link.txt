@@ -1,0 +1,2 @@
+/usr/bin/ar qc libflexiv_rdk.a CMakeFiles/flexiv_rdk.dir/lib/dummy.cpp.o
+/usr/bin/ranlib libflexiv_rdk.a
