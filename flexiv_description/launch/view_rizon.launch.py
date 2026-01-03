@@ -56,13 +56,17 @@ def generate_launch_description():
         executable="robot_state_publisher",
         name="robot_state_publisher",
         output="screen",
-        parameters=[{"robot_description": robot_description_content}],
+        parameters=[
+            {"robot_description": robot_description_content},
+            {"publish_frequency": 100.0},  # TF publish frequency (must be float)
+        ],
     )
 
     joint_state_publisher_node = Node(
         package="joint_state_publisher",
         executable="joint_state_publisher",
         name="joint_state_publisher",
+        parameters=[{"rate": 100}],  # Hz (integer)
         condition=UnlessCondition(LaunchConfiguration("gui")),
     )
 
@@ -70,6 +74,7 @@ def generate_launch_description():
         package="joint_state_publisher_gui",
         executable="joint_state_publisher_gui",
         name="joint_state_publisher_gui",
+        parameters=[{"rate": 100}],  # Hz (integer)
         condition=IfCondition(LaunchConfiguration("gui")),
     )
 
