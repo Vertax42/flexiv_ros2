@@ -17,9 +17,6 @@ find_package(rclcpp REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(hardware_interface REQUIRED)
 find_package(pluginlib REQUIRED)
-
-# # Set path to flexiv_rdk config file
-# set(flexiv_rdk_DIR ${CMAKE_CURRENT_SOURCE_DIR}/flexiv_rdk/build)
 find_package(flexiv_rdk REQUIRED)
 
 add_library(

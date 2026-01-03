@@ -45,10 +45,6 @@ FlexivHardwareInterface::on_init(const hardware_interface::HardwareInfo &info) {
       info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
   hw_commands_joint_efforts_.resize(info_.joints.size(),
                                     std::numeric_limits<double>::quiet_NaN());
-  hw_states_gpio_in_.resize(flexiv::rdk::kIOPorts,
-                            std::numeric_limits<double>::quiet_NaN());
-  hw_commands_gpio_out_.resize(flexiv::rdk::kIOPorts,
-                               std::numeric_limits<double>::quiet_NaN());
   stop_modes_ = {StoppingInterface::NONE, StoppingInterface::NONE,
                  StoppingInterface::NONE, StoppingInterface::NONE,
                  StoppingInterface::NONE, StoppingInterface::NONE,
@@ -198,13 +194,6 @@ FlexivHardwareInterface::export_state_interfaces() {
       robot_sn, "flexiv_robot_states",
       reinterpret_cast<double *>(&hw_flexiv_robot_states_addr_)));
 
-  const std::string prefix = info_.hardware_parameters.at("prefix");
-  for (std::size_t i = 0; i < flexiv::rdk::kIOPorts; i++) {
-    state_interfaces.emplace_back(hardware_interface::StateInterface(
-        prefix + "gpio", "digital_input_" + std::to_string(i),
-        &hw_states_gpio_in_[i]));
-  }
-
   return state_interfaces;
 }
 
@@ -223,13 +212,6 @@ FlexivHardwareInterface::export_command_interfaces() {
     command_interfaces.emplace_back(hardware_interface::CommandInterface(
         info_.joints[i].name, hardware_interface::HW_IF_EFFORT,
         &hw_commands_joint_efforts_[i]));
-  }
-
-  const std::string prefix = info_.hardware_parameters.at("prefix");
-  for (size_t i = 0; i < flexiv::rdk::kIOPorts; i++) {
-    command_interfaces.emplace_back(hardware_interface::CommandInterface(
-        prefix + "gpio", "digital_output_" + std::to_string(i),
-        &hw_commands_gpio_out_[i]));
   }
 
   return command_interfaces;
@@ -306,12 +288,6 @@ FlexivHardwareInterface::read(const rclcpp::Time & /*time*/,
       hw_states_joint_velocities_[i] = robot_->states().dtheta[i];
       hw_states_joint_efforts_[i] = robot_->states().tau[i];
     }
-
-    // Read GPIO input states
-    auto gpio_in = robot_->digital_inputs();
-    for (size_t i = 0; i < hw_states_gpio_in_.size(); i++) {
-      hw_states_gpio_in_[i] = static_cast<double>(gpio_in[i]);
-    }
   }
 
   return hardware_interface::return_type::OK;
@@ -357,32 +333,6 @@ FlexivHardwareInterface::write(const rclcpp::Time & /*time*/,
     std::vector<double> target_torque(robot_->info().DoF);
     target_torque = hw_commands_joint_efforts_;
     robot_->StreamJointTorque(target_torque, true, true);
-  }
-
-  // Write digital output
-  std::map<unsigned int, bool> digital_outputs;
-  for (size_t i = 0; i < hw_commands_gpio_out_.size(); i++) {
-    if (hw_commands_gpio_out_[i] != hw_commands_gpio_out_[i]) {
-      continue;
-    }
-    digital_outputs[i] = static_cast<bool>(hw_commands_gpio_out_[i]);
-  }
-  // Check if there are changes in the digital output values
-  bool digital_outputs_changed = false;
-  for (const auto &[index, value] : digital_outputs) {
-    if (current_digital_outputs_[index] != value) {
-      current_digital_outputs_[index] = value;
-      digital_outputs_changed = true;
-    }
-  }
-  current_digital_outputs_.clear();
-  for (const auto &[index, value] : digital_outputs) {
-    current_digital_outputs_[index] = value;
-  }
-
-  // Set digital outputs
-  if (digital_outputs_changed && !digital_outputs.empty()) {
-    robot_->SetDigitalOutputs(digital_outputs);
   }
 
   return hardware_interface::return_type::OK;

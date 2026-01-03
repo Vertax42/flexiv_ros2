@@ -102,13 +102,6 @@ private:
   flexiv::rdk::RobotStates *hw_flexiv_robot_states_addr_ =
       &hw_flexiv_robot_states_;
 
-  // GPIO commands and states
-  std::vector<double> hw_commands_gpio_out_;
-  std::vector<double> hw_states_gpio_in_;
-
-  // Current digital output map
-  std::map<unsigned int, bool> current_digital_outputs_;
-
   static rclcpp::Logger getLogger();
 
   // control modes
